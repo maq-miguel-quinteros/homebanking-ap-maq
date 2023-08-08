@@ -1,7 +1,6 @@
 package com.hb.maq.homebanking.controllers;
 
 import com.hb.maq.homebanking.dtos.ClientDTO;
-import com.hb.maq.homebanking.models.Client;
 import com.hb.maq.homebanking.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
