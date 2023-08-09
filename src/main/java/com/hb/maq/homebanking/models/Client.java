@@ -13,13 +13,16 @@ public class Client {
     @GenericGenerator(name = "native", strategy = "native")
     private Long id;
 
+    /** Es una colección del tipo account donde voy a tener detalles de cada cuenta del client */
     @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
     Set<Account> accounts = new HashSet<>();
 
+    /** getter del tipo de dato Account */
     public Set<Account> getAccounts(){
         return accounts;
     }
 
+    /** método configurar el cliente en una account y sumar un account a la colección accounts */
     public void addAccounts(Account account){
         account.setClient(this);
         accounts.add(account);

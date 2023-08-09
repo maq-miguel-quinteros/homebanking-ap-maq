@@ -3,6 +3,8 @@ package com.hb.maq.homebanking.dtos;
 import com.hb.maq.homebanking.models.Account;
 
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AccountDTO {
 
@@ -10,6 +12,7 @@ public class AccountDTO {
     private String number;
     private LocalDate creationDate;
     private double balance;
+    private Set<TransactionDTO> transactions;
 
     public AccountDTO() {
     }
@@ -19,39 +22,29 @@ public class AccountDTO {
         this.number = account.getNumber();
         this.creationDate = account.getCreationDate();
         this.balance = account.getBalance();
+
+        this.transactions = account.getTransactions()
+                .stream().map(transaction -> new TransactionDTO(transaction))
+                .collect(Collectors.toSet());
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getNumber() {
         return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
     }
 
     public LocalDate getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public double getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
-        this.balance = balance;
+    public Set<TransactionDTO> getTransactionDTOs() {
+        return transactions;
     }
-
-
 }
