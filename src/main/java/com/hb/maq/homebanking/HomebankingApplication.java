@@ -30,7 +30,7 @@ public class HomebankingApplication {
 			client01.addAccounts(account01);
 			accountRepository.save(account01);
 
-			Account account02 = new Account("VIN002", LocalDate.now().plusDays(1), 5000);
+			Account account02 = new Account("VIN002", LocalDate.now().plusDays(1), 7000);
 			client01.addAccounts(account02);
 			accountRepository.save(account02);
 
@@ -39,11 +39,11 @@ public class HomebankingApplication {
 
 			// creamos las cuentas para el cliente de pruebas y las relacionamos con el cliente
 			Account account03 = new Account("VIN001", LocalDate.now(), 5000);
-			client01.addAccounts(account03);
+			client02.addAccounts(account03);
 			accountRepository.save(account03);
 
-			Account account04 = new Account("VIN002", LocalDate.now().plusDays(1), 5000);
-			client01.addAccounts(account04);
+			Account account04 = new Account("VIN002", LocalDate.now().plusDays(1), 7000);
+			client02.addAccounts(account04);
 			accountRepository.save(account04);
 
 		});

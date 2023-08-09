@@ -31,6 +31,10 @@ public class Account {
         this.balance = balance;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getNumber() {
         return number;
     }
@@ -55,7 +59,6 @@ public class Account {
         this.balance = balance;
     }
 
-    @JsonIgnore
     public Client getClient() {
         return client;
     }
