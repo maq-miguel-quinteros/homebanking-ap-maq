@@ -28,6 +28,13 @@ public class Client {
         accounts.add(account);
     }
 
+    /** colección de tipo ClientLoan a la que solo le llamamos loan */
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    Set<ClientLoan> loans = new HashSet<>();
+
+    /** getter de tipo de dato ClientLoan al que solo llamamos loans */
+    public Set<ClientLoan> getLoans(){ return loans; }
+
     private String firstName;
     private String lastName;
     private String email;
