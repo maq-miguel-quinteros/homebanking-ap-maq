@@ -13,6 +13,7 @@ public class Client {
     @GenericGenerator(name = "native", strategy = "native")
     private Long id;
 
+
     /** Es una colección del tipo account donde voy a tener detalles de cada cuenta del client */
     @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
     Set<Account> accounts = new HashSet<>();
@@ -30,10 +31,22 @@ public class Client {
 
     /** colección de tipo ClientLoan a la que solo le llamamos loan */
     @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
-    Set<ClientLoan> loans = new HashSet<>();
+    private Set<ClientLoan> loans = new HashSet<>();
 
     /** getter de tipo de dato ClientLoan al que solo llamamos loans */
     public Set<ClientLoan> getLoans(){ return loans; }
+
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    private Set<Card> cards = new HashSet<>();
+
+    public Set<Card> getCards(){ return cards;}
+
+    public void addCards(Card card){
+        card.setClient(this);
+        cards.add(card);
+    }
+
 
     private String firstName;
     private String lastName;

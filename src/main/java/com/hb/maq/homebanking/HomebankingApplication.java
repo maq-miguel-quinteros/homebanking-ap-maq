@@ -20,7 +20,7 @@ public class HomebankingApplication {
 
 	@Bean
 	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository,
-									  LoanRepository loanRepository, ClientLoanRepository clientLoanRepository){
+									  LoanRepository loanRepository, ClientLoanRepository clientLoanRepository, CardRepository cardRepository){
 		return (args -> {
 			/**  CREAMOS LOS PRESTAMOS */
 			Loan loan01 = new Loan("Hipotecario", 500000.0, List.of(12,24,36,48,60));
@@ -75,6 +75,28 @@ public class HomebankingApplication {
 			clientLoanRepository.save(clientLoan03);
 			ClientLoan clientLoan04 = new ClientLoan(200000.0, 36, client02 ,loan03);
 			clientLoanRepository.save(clientLoan04);
+
+			/** CREAMOS LAS ENTIDADES CARD */
+			Card card01 = new Card((client01.getFirstName() + " " + client01.getLastName()),
+					CardType.DEBIT, CardColor.GOLD, "1234987645670001", 977,
+					LocalDate.now(), LocalDate.now().plusDays(1825));
+			client01.addCards(card01);
+			cardRepository.save(card01);
+
+
+			Card card02 = new Card((client01.getFirstName() + " " + client01.getLastName()),
+					CardType.CREDIT, CardColor.TITANIUM, "9874123445670001", 917,
+					LocalDate.now(), LocalDate.now().plusDays(1825));
+			client01.addCards(card02);
+			cardRepository.save(card02);
+
+
+			Card card03 = new Card((client02.getFirstName() + " " + client02.getLastName()),
+					CardType.CREDIT, CardColor.SILVER, "1234987645670002", 951,
+					LocalDate.now(), LocalDate.now().plusDays(1825));
+			client02.addCards(card03);
+			cardRepository.save(card03);
+
 
 
 		});
