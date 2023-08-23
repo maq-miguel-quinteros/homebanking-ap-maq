@@ -7,22 +7,17 @@ import java.util.stream.Collectors;
 
 public class ClientDTO {
 
+    /** ATRIBUTOS */
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
-
     private Set<AccountDTO> accounts;
-
     private Set<ClientLoanDTO> loans;
-
     private Set<CardDTO> cards;
 
-
-
-    public ClientDTO() {
-    }
-
+    /** CONSTRUCTORES */
+    public ClientDTO() {}
     public ClientDTO(Client client) {
         this.id = client.getId();
         this.firstName = client.getFirstName();
@@ -42,30 +37,25 @@ public class ClientDTO {
                 .collect(Collectors.toSet());
     }
 
-    public Set<AccountDTO> getAccounts(){
-        return accounts;
-    }
-
-    public Set<ClientLoanDTO> getLoans() {
-        return loans;
-    }
-
+    /** GETTERS */
     public Long getId() {
         return id;
     }
-
     public String getFirstName() {
         return firstName;
     }
-
     public String getLastName() {
         return lastName;
     }
-
     public String getEmail() {
         return email;
     }
-
+    public Set<AccountDTO> getAccounts(){
+        return accounts;
+    }
+    public Set<ClientLoanDTO> getLoans() {
+        return loans;
+    }
     public Set<CardDTO> getCards() {
         return cards;
     }
