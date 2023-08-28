@@ -21,11 +21,24 @@ public class WebAuthorization  {
     @Bean
     public SecurityFilterChain filterchain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(HttpMethod.POST,"/api/clients").permitAll()
-                .antMatchers("/api/clients/current").hasAuthority("CLIENT")
+                .antMatchers(HttpMethod.POST,
+                        "/api/clients").permitAll()
+                .antMatchers(
+                        "/api/login",
+                                    "/api/logout").permitAll()
+                .antMatchers(
+                        "/api/clients/current",
+                                    "/api/clients/current/accounts",
+                                    "/api/clients/current/cards").hasAuthority("CLIENT")
+                .antMatchers(HttpMethod.POST,
+                        "/api/clients/current/accounts",
+                                    "/api/clients/current/cards").hasAuthority("CLIENT")
+
                 .antMatchers("/api/accounts/**").hasAuthority("CLIENT")
-                .antMatchers("/rest/**", "/h2-console/**", "/api/**").hasAuthority("ADMIN")
-        ;
+                .antMatchers(
+                        "/rest/**",
+                                    "/h2-console/**",
+                                    "/api/**").hasAuthority("ADMIN");
 
         http.formLogin()
                 .usernameParameter("email")

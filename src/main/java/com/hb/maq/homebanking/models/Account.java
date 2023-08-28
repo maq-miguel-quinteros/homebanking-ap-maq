@@ -16,23 +16,20 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private Long id;
-
     private String number;
-    private LocalDate creationDate;
+    private LocalDate date;
     private double balance;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
     private Client client;
-
     @OneToMany(mappedBy = "account",fetch = FetchType.EAGER)
     private Set<Transaction> transactions = new HashSet<>();
 
     /** CONSTRUCTORES */
     public Account() {}
-    public Account(String number, LocalDate creationDate, double balance) {
+    public Account(String number, LocalDate date, double balance) {
         this.number = number;
-        this.creationDate = creationDate;
+        this.date = date;
         this.balance = balance;
     }
 
@@ -52,11 +49,11 @@ public class Account {
     public void setNumber(String number) {
         this.number = number;
     }
-    public LocalDate getCreationDate() {
-        return creationDate;
+    public LocalDate getDate() {
+        return date;
     }
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
     public double getBalance() {
         return balance;

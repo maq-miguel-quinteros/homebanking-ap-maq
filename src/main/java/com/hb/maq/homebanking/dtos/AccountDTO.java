@@ -11,7 +11,7 @@ public class AccountDTO {
     /** ATRIBUTOS */
     private Long id;
     private String number;
-    private LocalDate creationDate;
+    private LocalDate date;
     private double balance;
     private Set<TransactionDTO> transactions;
 
@@ -20,7 +20,7 @@ public class AccountDTO {
     public AccountDTO(Account account) {
         this.id = account.getId();
         this.number = account.getNumber();
-        this.creationDate = account.getCreationDate();
+        this.date = account.getDate();
         this.balance = account.getBalance();
 
         this.transactions = account.getTransactions()
@@ -35,8 +35,8 @@ public class AccountDTO {
     public String getNumber() {
         return number;
     }
-    public LocalDate getCreationDate() {
-        return creationDate;
+    public LocalDate getDate() {
+        return date;
     }
     public double getBalance() {
         return balance;

@@ -10,7 +10,7 @@ public class CardDTO {
 
     /** ATRIBUTOS */
     private Long id;
-    private String cardholder;
+    private String cardHolder;
     private CardType type;
     private CardColor color;
     private String number;
@@ -22,7 +22,7 @@ public class CardDTO {
     public CardDTO() {}
     public CardDTO(Card card) {
         this.id = card.getId();
-        this.cardholder = card.getCardholder();
+        this.cardHolder = card.getCardHolder();
         this.type = card.getType();
         this.color = card.getColor();
         this.number = card.getNumber();
@@ -35,8 +35,8 @@ public class CardDTO {
     public Long getId() {
         return id;
     }
-    public String getCardholder() {
-        return cardholder;
+    public String getCardHolder() {
+        return cardHolder;
     }
     public CardType getType() {
         return type;

@@ -23,11 +23,9 @@ public class ClientLoan {
 
     /** CONSTRUCTORES */
     public ClientLoan() {}
-    public ClientLoan(Double amount, int payments, Client client, Loan loan) {
+    public ClientLoan(Double amount, int payments) {
         this.amount = amount;
         this.payments = payments;
-        this.client = client;
-        this.loan = loan;
     }
 
     /** GETTERS Y SETTERS */

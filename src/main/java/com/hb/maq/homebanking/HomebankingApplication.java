@@ -77,23 +77,25 @@ public class HomebankingApplication {
 
 
 			/** CREAMOS LAS CUENTAS, LAS RELACIONAMOS CON SU CLIENTE Y LAS PERSISTIMOS EN LA DB */
-			Account account01 = new Account("VIN001",
+			Account account01 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
 					LocalDate.now(), 5000);
 					/** MEDIANTE EL MÉTODO now() DEL OBJETO LocalDate PASAMOS LA FECHA ACTUAL (LA DEL MOMENTO DE EJECUCIÓN) */
 
 			/** MEDIANTE EL MÉTODO addAccounts() DEL OBJETO client01 RELACIONAMOS LA CUENTA account01 A ESE OBJETO */
 			client01.addAccounts(account01);
 			accountRepository.save(account01);
-			Account account02 = new Account("VIN002",
+			Account account02 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
 					LocalDate.now().plusDays(1), 7000);
 									/** MEDIANTE EL MÉTODO plusDays() SUMAMOS DIAS A LA FECHA ACTUAL
 									 * QUE NOS DEVUELVE EL MÉTODO now() DEL OBJETO LocalDate */
 			client01.addAccounts(account02);
 			accountRepository.save(account02);
-			Account account03 = new Account("VIN001", LocalDate.now(), 5000);
+			Account account03 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+					LocalDate.now(), 5000);
 			client02.addAccounts(account03);
 			accountRepository.save(account03);
-			Account account04 = new Account("VIN002", LocalDate.now().plusDays(1), 7000);
+			Account account04 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+					LocalDate.now().plusDays(1), 7000);
 			client02.addAccounts(account04);
 			accountRepository.save(account04);
 
@@ -118,37 +120,68 @@ public class HomebankingApplication {
 			loanRepository.save(loan03);
 
 
-			/** CREAMOS LAS ENTIDADES ClientLoan INTERMEDIA ENTRE EL CLIENTE Y EL PRÉSTAMO Y LAS PERSISTIMOS EN LA DB*/
-			ClientLoan clientLoan01 = new ClientLoan( 400000.0, 60, client01, loan01);
+			/** CREAMOS LAS ENTIDADES ClientLoan INTERMEDIA ENTRE EL CLIENTE Y EL PRESTAMO, LAS RELACIONAMOS
+			 * CON SU CLIENTE Y CON SU PRESTAMOS RESPECTIVOS Y LAS PERSISTIMOS EN LA DB*/
+			ClientLoan clientLoan01 = new ClientLoan( 400000.0, 60);
+			client01.addClientLoan(clientLoan01);
+			loan01.addClientLoan(clientLoan01);
 			clientLoanRepository.save(clientLoan01);
-			ClientLoan clientLoan02 = new ClientLoan(50000.0, 12, client01, loan02);
+			ClientLoan clientLoan02 = new ClientLoan(50000.0, 12);
+			client01.addClientLoan(clientLoan02);
+			loan02.addClientLoan(clientLoan02);
 			clientLoanRepository.save(clientLoan02);
-			ClientLoan clientLoan03 = new ClientLoan(100000.0, 24, client02, loan02);
+			ClientLoan clientLoan03 = new ClientLoan(100000.0, 24);
+			client02.addClientLoan(clientLoan03);
+			loan02.addClientLoan(clientLoan03);
 			clientLoanRepository.save(clientLoan03);
-			ClientLoan clientLoan04 = new ClientLoan(200000.0, 36, client02 ,loan03);
+			ClientLoan clientLoan04 = new ClientLoan(200000.0, 36);
+			client02.addClientLoan(clientLoan04);
+			loan03.addClientLoan(clientLoan04);
 			clientLoanRepository.save(clientLoan04);
 
 
 			/** CREAMOS LAS TARJETAS, LAS RELACIONAMOS CON SU CLIENTE Y LAS PERSISTIMOS EN LA DB */
-			Card card01 = new Card((client01.getFirstName() + " " + client01.getLastName()),
+			Card card01 = new Card(
+					(client01.getFirstName() + " " + client01.getLastName()),
 					/** Los enums, llamados también enumeraciones o listado específico, se refieren a la herramienta
 					 * que permite representar conjuntos de constantes con un nombre.
 					 * Estas enumeraciones se utilizan cuando se tiene conocimiento completo
 					 * con respecto de los valores posibles que puede tomar */
-					CardType.DEBIT, CardColor.GOLD, "1234987645670001", 977,
 					/** MEDIANTE LOS enum CardType Y CardColor PASAMOS LOS VALORES DEBIT Y GOLD
 					 * AL CONSTRUCTOR DE LA CLASE Card */
-					LocalDate.now(), LocalDate.now().plusDays(1825));
+					CardType.DEBIT, CardColor.GOLD,
+					/** EL MÉTODO random() DEL OBJETO Math NOS DEVUELVE UN NÚMERO AL AZAR ENTRE 0 Y 1 NO INCLUSIVE (0 A 0.9)
+					 * LA EXPRESIÓN "Math.random() * 9999 + 1" NOS DEVUELVE UN NÚMERO ALEATORIO DE 4 CIFRAS
+					 * MEDIANTE (int) HACEMOS UN cast, ES DECIR, CONVERTIMOS EL NÚMERO CON COMA FLOTANTE
+					 * QUE DEVUELVE LA EXPRESIÓN EN UN NÚMERO ENTERO
+					 * AL HACER + "-" CONVERTIMOS EL NÚMERO ENTERO DE LA IZQUIERDA DE LA EXPRESIÓN EN String Y
+					 * CONCATENAMOS EL GUION - COMO EN CUALQUIER CONCATENACIÓN DE String */
+					((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)) + "-" +
+					((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)),
+					/** EL MÉTODO random() DEL OBJETO Math NOS DEVUELVE UN NÚMERO AL AZAR ENTRE 0 Y 1 NO INCLUSIVE (0 A 0.9)
+					 * LA EXPRESIÓN "Math.random() * 999 + 1" NOS DEVUELVE UN NÚMERO ALEATORIO DE 3 CIFRAS */
+					(int)(Math.random() * 999 + 1),
+					/** MEDIANTE EL MÉTODO plusYears() SUMAMOS años A LA FECHA ACTUAL
+					 * QUE NOS DEVUELVE EL MÉTODO now() DEL OBJETO LocalDate */
+					 LocalDate.now(), LocalDate.now().plusYears(5));
 			client01.addCards(card01);
 			cardRepository.save(card01);
-			Card card02 = new Card((client01.getFirstName() + " " + client01.getLastName()),
-					CardType.CREDIT, CardColor.TITANIUM, "9874123445670001", 917,
-					LocalDate.now(), LocalDate.now().plusDays(1825));
+			Card card02 = new Card(
+					(client01.getFirstName() + " " + client01.getLastName()),
+					CardType.CREDIT, CardColor.TITANIUM,
+			((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)) + "-" +
+					((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)),
+					(int)(Math.random() * 999 + 1),
+					LocalDate.now(), LocalDate.now().plusYears(5));
 			client01.addCards(card02);
 			cardRepository.save(card02);
-			Card card03 = new Card((client02.getFirstName() + " " + client02.getLastName()),
-					CardType.CREDIT, CardColor.SILVER, "1234987645670002", 951,
-					LocalDate.now(), LocalDate.now().plusDays(1825));
+			Card card03 = new Card(
+					(client02.getFirstName() + " " + client02.getLastName()),
+					CardType.CREDIT, CardColor.SILVER,
+			((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)) + "-" +
+					((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)),
+					(int)(Math.random() * 999 + 1),
+					LocalDate.now(), LocalDate.now().plusYears(5));
 			client02.addCards(card03);
 			cardRepository.save(card03);
 		});
