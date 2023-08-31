@@ -33,10 +33,19 @@ public class AccountController {
         Client client = clientRepository.findByEmail(authentication.getName());
 
         if (client.getAccounts().size() < 3 ){
-            Account account = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)), LocalDate.now(), 0);
+
+            Account account = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+                    LocalDate.now(), 0);
+
+            while ( accountRepository.findByNumber(account.getNumber()) != null ){
+                account.setNumber("VIN-" + ((int)(Math.random() * 99999999 + 1)));
+            }
+
             client.addAccounts(account);
             accountRepository.save(account);
+
             return new ResponseEntity<>(HttpStatus.CREATED);
+
         } else {
             return new ResponseEntity<>("Solo se pueden generar 3 cuentas por cliente", HttpStatus.FORBIDDEN);
         }

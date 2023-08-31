@@ -18,7 +18,7 @@ public class Account {
     private Long id;
     private String number;
     private LocalDate date;
-    private double balance;
+    private Double balance;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
     private Client client;
@@ -55,10 +55,10 @@ public class Account {
     public void setDate(LocalDate date) {
         this.date = date;
     }
-    public double getBalance() {
+    public Double getBalance() {
         return balance;
     }
-    public void setBalance(double balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
     public Client getClient() {

@@ -12,4 +12,6 @@ import java.util.List;
 public interface CardRepository extends JpaRepository <Card, Long> {
 
     public List<Card> findByClient(Client client);
+
+    public Card findByNumber(String number);
 }
