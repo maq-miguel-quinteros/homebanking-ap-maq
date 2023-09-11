@@ -27,7 +27,7 @@ public class Account {
 
     /** CONSTRUCTORES */
     public Account() {}
-    public Account(String number, LocalDate date, double balance) {
+    public Account(String number, LocalDate date, Double balance) {
         this.number = number;
         this.date = date;
         this.balance = balance;

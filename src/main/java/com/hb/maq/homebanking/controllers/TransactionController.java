@@ -7,6 +7,9 @@ import com.hb.maq.homebanking.models.TransactionType;
 import com.hb.maq.homebanking.repositories.AccountRepository;
 import com.hb.maq.homebanking.repositories.ClientRepository;
 import com.hb.maq.homebanking.repositories.TransactionRepository;
+import com.hb.maq.homebanking.services.AccountService;
+import com.hb.maq.homebanking.services.ClientService;
+import com.hb.maq.homebanking.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,16 +30,13 @@ public class TransactionController {
 
     /** INYECCIÓN DE DEPENDENCIAS */
     @Autowired
-    ClientRepository clientRepository;
+    private ClientService clientService;
     @Autowired
-    AccountRepository accountRepository;
-
+    private AccountService accountService;
     @Autowired
-    TransactionRepository transactionRepository;
+    private TransactionService transactionService;
 
-    /** ####### CRUD: CREATE | READ | UPDATE | DELETE ####### */
     /** CREATE */
-
     @Transactional
     @RequestMapping(value = "/transactions", method = RequestMethod.POST)
     public ResponseEntity<Object> createTransactions(
@@ -49,13 +49,13 @@ public class TransactionController {
             return new ResponseEntity<>("Faltan ingresar datos para realizar la transacción", HttpStatus.FORBIDDEN);
         }
 
-        Account fromAccount = accountRepository.findByNumber(fromAccountNumber);
+        Account fromAccount = accountService.findByNumber(fromAccountNumber);
         /** 403 forbidden, si la cuenta de origen no existe */
         if ( fromAccount == null ){
             return new ResponseEntity<>("El número de cuenta orígen no existe", HttpStatus.FORBIDDEN);
         }
 
-        Account toAccount = accountRepository.findByNumber(toAccountNumber);
+        Account toAccount = accountService.findByNumber(toAccountNumber);
         /** 403 forbidden, si la cuenta de destino no existe */
         if ( toAccount == null ){
             return new ResponseEntity<>("El número de cuenta destino no existe", HttpStatus.FORBIDDEN);
@@ -66,7 +66,7 @@ public class TransactionController {
             return new ResponseEntity<>("El número de cuenta origen y destino es el mismo", HttpStatus.FORBIDDEN);
         }
 
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
         /** 403 forbidden, si la cuenta de origen no pertenece al cliente autenticado */
         if ( !client.getAccounts().contains(fromAccount) ){
             return new ResponseEntity<>("El número de cuenta origen no corresponde al cliente", HttpStatus.FORBIDDEN);
@@ -80,16 +80,16 @@ public class TransactionController {
         Transaction debit = new Transaction(TransactionType.DEBIT, amount * -1, description + " " + fromAccount.getNumber() ,
                 LocalDateTime.now());
         fromAccount.addTransaction(debit);
-        transactionRepository.save(debit);
+        transactionService.save(debit);
         fromAccount.setBalance(fromAccount.getBalance() - amount);
-        accountRepository.save(fromAccount);
+        accountService.save(fromAccount);
 
         Transaction credit = new Transaction(TransactionType.CREDIT, amount, description + " " + toAccount.getNumber(),
                 LocalDateTime.now());
         toAccount.addTransaction(credit);
-        transactionRepository.save(credit);
+        transactionService.save(credit);
         toAccount.setBalance(toAccount.getBalance() + amount);
-        accountRepository.save(toAccount);
+        accountService.save(toAccount);
 
         return new ResponseEntity<>("Transacción creada correctamente", HttpStatus.CREATED);
     }

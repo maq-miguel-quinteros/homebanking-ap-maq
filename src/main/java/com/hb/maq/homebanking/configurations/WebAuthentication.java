@@ -2,7 +2,7 @@
 package com.hb.maq.homebanking.configurations;
 
 import com.hb.maq.homebanking.models.Client;
-import com.hb.maq.homebanking.repositories.ClientRepository;
+import com.hb.maq.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +23,12 @@ public class WebAuthentication extends GlobalAuthenticationConfigurerAdapter {
     }
 
     @Autowired
-    ClientRepository clientRepository;
+    private ClientService clientService;
 
     @Override
     public void init(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(inputName -> {
-            Client client = clientRepository.findByEmail(inputName);
+            Client client = clientService.findByEmail(inputName);
 
             if( client!=null ){
                 if (client.getEmail().equals("admin@admin.com")){

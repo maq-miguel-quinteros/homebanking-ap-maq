@@ -1,7 +1,7 @@
 package com.hb.maq.homebanking;
 
 import com.hb.maq.homebanking.models.*;
-import com.hb.maq.homebanking.repositories.*;
+import com.hb.maq.homebanking.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,159 +13,168 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** @SpringBootApplication es la anotación que aparece en la función main de todo proyecto que definamos con Spring Boot
- * Esta anotación herede el comportamiento de un conjunto de anotaciones:
- * @EnableAutoConfiguration: se encarga de forma inteligente de intentar configurar Spring de forma automática.
- * Busca en el Classpath todas las clases con @Entity y las registra con el proveedor de persistencia que tengamos.
- * @SpringConfiguration: define que el fichero es un fichero de Configuración de Spring.
- * Solo puede haber una de estas anotaciones en la aplicación
- * @ConponentScan: revisa los paquetes actuales y registra de forma automática cualquier @Service @Repository @Controller
- * https://www.arquitecturajava.com/springbootapplication-una-anotacion-clave */
+
 @SpringBootApplication
 public class HomebankingApplication {
-
-	/** @Autowired es una anotación utilizada en Spring Boot para habilitar la inyección automática de dependencias.
-	 * Permite al contenedor de Spring proporcionar una instancia de una dependencia requerida cuando se crea un bean.
-	 * Esta anotación puede utilizarse en campos, constructores y métodos para que Spring proporcione las dependencias automáticamente.
-	 * La inyección de dependencias es un patrón de diseño en el que a los objetos se les pasan sus dependencias en lugar de crearlas internamente.
-	 * En Spring Boot, @Autowired se utiliza para inyectar objetos en otros objetos.
-	 * Esto permite un acoplamiento suelto entre componentes y ayuda a mantener el código más mantenible.
-	 * https://gustavopeiretti.com/spring-boot-anotacion-autowired/#:~:text=%40Autowired%20es%20una%20anotaci%C3%B3n%20utilizada,cuando%20se%20crea%20un%20bean */
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
+	@Autowired
+	private ClientService clientService;
+	@Autowired
+	private AccountService accountService;
+	@Autowired
+	private TransactionService transactionService;
+	@Autowired
+	private LoanService loanService;
+	@Autowired
+	private ClientLoanService clientLoanService;
+	@Autowired
+	private CardService cardService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(HomebankingApplication.class, args);
 	}
 
-	/** Dentro de la infraestructura de Spring tenemos algo llamado Spring Container (contendedor). El núcleo del framework.
-	 * El contenedor crea objetos, los une, los configura y administra su ciclo de vida completamente.
-	 * Los Beans son objetos que maneja el contendor de spring.
-	 * De cierta manera son clases de java, que implementan algo llamado “Dependency Injection”.
-	 * Spring puede definir Beans (Objetos) con configuraciones específicas y yo podría inyectarlas en alguna clase que lo necesite.
-	 * Spring tiene anotaciones específicas para ello como @Controller que agrega esas características a mi clase
-	 * https://es.quora.com/Qu%C3%A9-es-Spring-Beans */
 	@Bean
-	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository,
-									  LoanRepository loanRepository, ClientLoanRepository clientLoanRepository, CardRepository cardRepository){
-									/** HACEMOS INYECCIÓN DE DEPENDENCIAS DE LAS INTERFACES QUE NECESITAMOS EJ. ClientRepository clientRepository
-									 * VAMOS A UTILIZAR EL OBJETO clientRepository PARA APROVECHAR LOS MÉTODOS QUE HEREDA EJ. save() */
-
+	public CommandLineRunner initData(){
 		return (args -> {
 
-			/** INDICAMOS QUE LA VARIABLE | ATRIBUTO client01 VA A SER DE TIPO Client MEDIANTE LA SENTENCIA Client client
-			 * SE RESERVA UN ESPACIO EN MEMORIA PARA ESA VARIABLE
-			 * INSTANCIAMOS LA CLASE | CREAMOS UN OBJETO DE TIPO Client MEDIANTE LA PALABRA RESERVADA new
-			 * LLAMAMOS LA CONSTRUCTOR DE LA CLASE Client() PASANDO POR PARÁMETRO (DENTRO DEL PARÉNTESIS) LOS VALORES DEL NUEVO OBJETO
-			 * EL CONSTRUCTOR ASIGNA ESTOS VALORES A LOS ATRIBUTOS DE LA CLASE SEGÚN SU DEFINICIÓN */
+			/** CREAMOS NUEVOS CLIENTES Y LOS PERSISTIMOS EN LA DB */
 			Client client01 = new Client("Melba", "Morel", "melba@mindhub.com",
 					passwordEncoder.encode("melba"));
-					/** UTILIZAMOS EL MÉTODO encode() DEL OBJETO passwordEncoder PARA CODIFICAR LA CONTRASEÑA DEL CLIENTE */
-
-			/** PERSISTIMOS EL CLIENTE EN LA DB PASANDO POR PARÁMETRO EL OBJETO client01 AL MÉTODO save()
-			 * MEDIANTE LA INYECCIÓN DE DEPENDENCIAS TENEMOS UN OBJETO DE LA INTERFACE ClientRepository llamado clientRepository
-			 * POR HERENCIA DE LA INTERFACE JpaRepository EL OBJETO clientRepository CUENTA CON EL MÉTODO save()
-			 * EL MÉTODO save() SE ENCARGA DE HACER LA PERSISTENCIA EN LA DB */
-			clientRepository.save(client01);
-
-			/** CREAMOS NUEVOS CLIENTES Y LOS PERSISTIMOS EN LA DB */
-			Client client02 = new Client("Miguel", "Quinteros", "ejemplo@ejemplo", passwordEncoder.encode("contraseña"));
-			clientRepository.save(client02);
-			Client client03 = new Client("Administrador", "HomeBanking", "admin@admin", passwordEncoder.encode("admin"));
-			clientRepository.save(client03);
+			clientService.save(client01);
+			Client client02 = new Client("Miguel", "Quinteros", "ejemplo@ejemplo",
+					passwordEncoder.encode("contraseña"));
+			clientService.save(client02);
+			Client client03 = new Client("Administrador", "HomeBanking", "admin@admin",
+					passwordEncoder.encode("admin"));
+			clientService.save(client03);
+			Client client04 = new Client("Bruce", "Wayne","brucewayne@lexcorp.com",
+					passwordEncoder.encode("iambatman89"));
+			clientService.save(client04);
+			Client client05 = new Client("Mary Jane", "Watson", "mjwatson@uolsinectis.com",
+					passwordEncoder.encode("iloveharry"));
+			clientService.save(client05);
 
 
 			/** CREAMOS LAS CUENTAS, LAS RELACIONAMOS CON SU CLIENTE Y LAS PERSISTIMOS EN LA DB */
-			Account account01 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
-					LocalDate.now(), 5000);
-					/** MEDIANTE EL MÉTODO now() DEL OBJETO LocalDate PASAMOS LA FECHA ACTUAL (LA DEL MOMENTO DE EJECUCIÓN) */
+			Account account01A = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+					LocalDate.now(), 5000.0);
+			client01.addAccounts(account01A);
+			accountService.save(account01A);
+			Account account01B = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+					LocalDate.now().plusDays(1), 7000.0);
+			client01.addAccounts(account01B);
+			accountService.save(account01B);
 
-			/** MEDIANTE EL MÉTODO addAccounts() DEL OBJETO client01 RELACIONAMOS LA CUENTA account01 A ESE OBJETO */
-			client01.addAccounts(account01);
-			accountRepository.save(account01);
 			Account account02 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
-					LocalDate.now().plusDays(1), 7000);
-									/** MEDIANTE EL MÉTODO plusDays() SUMAMOS DIAS A LA FECHA ACTUAL
-									 * QUE NOS DEVUELVE EL MÉTODO now() DEL OBJETO LocalDate */
-			client01.addAccounts(account02);
-			accountRepository.save(account02);
+					LocalDate.now(), 5000.0);
+			client02.addAccounts(account02);
+			accountService.save(account02);
+
 			Account account03 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
-					LocalDate.now(), 5000);
+					LocalDate.now().plusDays(1), 7000.0);
 			client02.addAccounts(account03);
-			accountRepository.save(account03);
-			Account account04 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
-					LocalDate.now().plusDays(1), 7000);
-			client02.addAccounts(account04);
-			accountRepository.save(account04);
+			accountService.save(account03);
+
+			Account account04A = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+					LocalDate.now(), 5000000000.0);
+			client04.addAccounts(account04A);
+			accountService.save(account04A);
+			Account account04B = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+					LocalDate.now(), 9000000000000.0);
+			client04.addAccounts(account04B);
+			accountService.save(account04B);
+
+			Account account05 = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)),
+					LocalDate.now(), 1000.0);
+			client05.addAccounts(account05);
+			accountService.save(account05);
 
 
 			/** CREAMOS LAS TRANSACCIONES, LAS RELACIONAMOS CON SU CUENTA Y LAS PERSISTIMOS EN LA DB */
-			Transaction transaction01 = new Transaction(TransactionType.CREDIT, 15000, "Transferencia desde cuenta propia",
+			Transaction transaction01A = new Transaction(TransactionType.CREDIT, 15000, "Transferencia desde cuenta no propia",
 					LocalDateTime.now());
-					/** MEDIANTE EL MÉTODO now() DEL OBJETO LocalDateTime PASAMOS LA FECHA Y HORA ACTUAL (LA DEL MOMENTO DE EJECUCIÓN) */
-			account01.addTransaction(transaction01);
-			transactionRepository.save(transaction01);
+			account01A.addTransaction(transaction01A);
+			transactionService.save(transaction01A);
+			Transaction transaction01B = new Transaction(TransactionType.DEBIT, -500, "Pago de servicios",
+					LocalDateTime.now());
+			account01A.addTransaction(transaction01B);
+			transactionService.save(transaction01B);
+			Transaction transaction01C = new Transaction(TransactionType.DEBIT, -1000.2, "Compra en casa de ropa",
+					LocalDateTime.now());
+			account01A.addTransaction(transaction01C);
+			transactionService.save(transaction01C);
+
+			Transaction transaction04A = new Transaction(TransactionType.DEBIT, -200000000.5, "Compra de todo Warner",
+					LocalDateTime.now());
+			account04A.addTransaction(transaction04A);
+			transactionService.save(transaction04A);
+			Transaction transaction04B = new Transaction(TransactionType.DEBIT, -50000, "Pago de aguinaldo a Alfred",
+					LocalDateTime.now());
+			account04A.addTransaction(transaction04B);
+			transactionService.save(transaction04B);
+			Transaction transaction04C = new Transaction(TransactionType.CREDIT, 100000000, "Venta de dollar oficial al arbolito",
+					LocalDateTime.now());
+			account04A.addTransaction(transaction04C);
+			transactionService.save(transaction04C);
+
+			Transaction transaction04D = new Transaction(TransactionType.DEBIT, -20000.5, "Compra de papas fritas hechas en francia",
+					LocalDateTime.now());
+			account04B.addTransaction(transaction04D);
+			transactionService.save(transaction04D);
+			Transaction transaction04E = new Transaction(TransactionType.CREDIT, 50000000, "Ganancia por venta de colchones usados",
+					LocalDateTime.now());
+			account04B.addTransaction(transaction04E);
+			transactionService.save(transaction04E);
+			Transaction transaction04F = new Transaction(TransactionType.DEBIT, 10000, "Pago del instituto de Robin",
+					LocalDateTime.now());
+			account04B.addTransaction(transaction04F);
+			transactionService.save(transaction04F);
 
 
 			/**  CREAMOS LOS PRESTAMOS Y LOS PERSISTIMOS EN LA DB */
 			Loan loan01 = new Loan("Hipotecario", 500000.0,
 					List.of(12,24,36,48,60));
-					/** MEDIANTE EL MÉTODO of() DEL OBJETO List PASAMOS UNA LISTA DE ENTEROS
-					 * QUE REPRESENTAN EL ATRIBUTO payments DE LA CLASE */
-			loanRepository.save(loan01);
-			Loan loan02 = new Loan("Personal", 100000.0, List.of(6,12,24));
-			loanRepository.save(loan02);
-			Loan loan03 = new Loan("Automotriz", 300000.0, List.of(6,12,24,36));
-			loanRepository.save(loan03);
+			loanService.save(loan01);
+			Loan loan02 = new Loan("Personal", 100000.0,
+					List.of(6,12,24));
+			loanService.save(loan02);
+			Loan loan03 = new Loan("Automotriz", 300000.0,
+					List.of(6,12,24,36));
+			loanService.save(loan03);
 
 
-			/** CREAMOS LAS ENTIDADES ClientLoan INTERMEDIA ENTRE EL CLIENTE Y EL PRESTAMO, LAS RELACIONAMOS
+			/** CREAMOS LAS ENTIDADES ClientLoan INTERMEDIA ENTRE EL CLIENTE Y EL PRÉSTAMO, LAS RELACIONAMOS
 			 * CON SU CLIENTE Y CON SU PRESTAMOS RESPECTIVOS Y LAS PERSISTIMOS EN LA DB*/
 			ClientLoan clientLoan01 = new ClientLoan( 400000.0, 60);
 			client01.addClientLoan(clientLoan01);
 			loan01.addClientLoan(clientLoan01);
-			clientLoanRepository.save(clientLoan01);
+			clientLoanService.save(clientLoan01);
 			ClientLoan clientLoan02 = new ClientLoan(50000.0, 12);
 			client01.addClientLoan(clientLoan02);
 			loan02.addClientLoan(clientLoan02);
-			clientLoanRepository.save(clientLoan02);
+			clientLoanService.save(clientLoan02);
 			ClientLoan clientLoan03 = new ClientLoan(100000.0, 24);
 			client02.addClientLoan(clientLoan03);
 			loan02.addClientLoan(clientLoan03);
-			clientLoanRepository.save(clientLoan03);
+			clientLoanService.save(clientLoan03);
 			ClientLoan clientLoan04 = new ClientLoan(200000.0, 36);
 			client02.addClientLoan(clientLoan04);
 			loan03.addClientLoan(clientLoan04);
-			clientLoanRepository.save(clientLoan04);
+			clientLoanService.save(clientLoan04);
 
 
 			/** CREAMOS LAS TARJETAS, LAS RELACIONAMOS CON SU CLIENTE Y LAS PERSISTIMOS EN LA DB */
 			Card card01 = new Card(
 					(client01.getFirstName() + " " + client01.getLastName()),
-					/** Los enums, llamados también enumeraciones o listado específico, se refieren a la herramienta
-					 * que permite representar conjuntos de constantes con un nombre.
-					 * Estas enumeraciones se utilizan cuando se tiene conocimiento completo
-					 * con respecto de los valores posibles que puede tomar */
-					/** MEDIANTE LOS enum CardType Y CardColor PASAMOS LOS VALORES DEBIT Y GOLD
-					 * AL CONSTRUCTOR DE LA CLASE Card */
 					CardType.DEBIT, CardColor.GOLD,
-					/** EL MÉTODO random() DEL OBJETO Math NOS DEVUELVE UN NÚMERO AL AZAR ENTRE 0 Y 1 NO INCLUSIVE (0 A 0.9)
-					 * LA EXPRESIÓN "Math.random() * 9999 + 1" NOS DEVUELVE UN NÚMERO ALEATORIO DE 4 CIFRAS
-					 * MEDIANTE (int) HACEMOS UN cast, ES DECIR, CONVERTIMOS EL NÚMERO CON COMA FLOTANTE
-					 * QUE DEVUELVE LA EXPRESIÓN EN UN NÚMERO ENTERO
-					 * AL HACER + "-" CONVERTIMOS EL NÚMERO ENTERO DE LA IZQUIERDA DE LA EXPRESIÓN EN String Y
-					 * CONCATENAMOS EL GUION - COMO EN CUALQUIER CONCATENACIÓN DE String */
 					((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)) + "-" +
 					((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)),
-					/** EL MÉTODO random() DEL OBJETO Math NOS DEVUELVE UN NÚMERO AL AZAR ENTRE 0 Y 1 NO INCLUSIVE (0 A 0.9)
-					 * LA EXPRESIÓN "Math.random() * 999 + 1" NOS DEVUELVE UN NÚMERO ALEATORIO DE 3 CIFRAS */
 					(int)(Math.random() * 999 + 1),
-					/** MEDIANTE EL MÉTODO plusYears() SUMAMOS años A LA FECHA ACTUAL
-					 * QUE NOS DEVUELVE EL MÉTODO now() DEL OBJETO LocalDate */
 					 LocalDate.now(), LocalDate.now().plusYears(5));
 			client01.addCards(card01);
-			cardRepository.save(card01);
+			cardService.save(card01);
 			Card card02 = new Card(
 					(client01.getFirstName() + " " + client01.getLastName()),
 					CardType.CREDIT, CardColor.TITANIUM,
@@ -174,7 +183,7 @@ public class HomebankingApplication {
 					(int)(Math.random() * 999 + 1),
 					LocalDate.now(), LocalDate.now().plusYears(5));
 			client01.addCards(card02);
-			cardRepository.save(card02);
+			cardService.save(card02);
 			Card card03 = new Card(
 					(client02.getFirstName() + " " + client02.getLastName()),
 					CardType.CREDIT, CardColor.SILVER,
@@ -183,7 +192,7 @@ public class HomebankingApplication {
 					(int)(Math.random() * 999 + 1),
 					LocalDate.now(), LocalDate.now().plusYears(5));
 			client02.addCards(card03);
-			cardRepository.save(card03);
+			cardService.save(card03);
 		});
 	}
 }

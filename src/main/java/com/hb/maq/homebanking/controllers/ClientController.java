@@ -5,6 +5,8 @@ import com.hb.maq.homebanking.models.Account;
 import com.hb.maq.homebanking.models.Client;
 import com.hb.maq.homebanking.repositories.AccountRepository;
 import com.hb.maq.homebanking.repositories.ClientRepository;
+import com.hb.maq.homebanking.services.AccountService;
+import com.hb.maq.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,53 +27,52 @@ public class ClientController {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private ClientRepository clientRepository;
+    private ClientService clientService;
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountService accountService;
 
-
-    /** ####### CRUD: CREATE | READ | UPDATE | DELETE ####### */
-    /** CREATE */
+    /** CREATE CLIENTE */
     @RequestMapping(value = "/clients", method = RequestMethod.POST)
-    public ResponseEntity<Object> register(@RequestParam String firstName, @RequestParam String lastName,
+    public ResponseEntity<Object> createClient(@RequestParam String firstName, @RequestParam String lastName,
                                             @RequestParam String email, @RequestParam String password) {
 
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
             return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
         }
-        if (clientRepository.findByEmail(email) != null) {
+        if (clientService.findByEmail(email) != null) {
             return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
         }
 
         Client client = new Client(firstName, lastName, email, passwordEncoder.encode(password));
-        clientRepository.save(client);
+        clientService.save(client);
 
-        Account account = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)), LocalDate.now(), 0);
+        /** CREATE ACCOUNT */
+        Account account = new Account("VIN-" + ((int)(Math.random() * 99999999 + 1)), LocalDate.now(), 0.0);
         client.addAccounts(account);
-        accountRepository.save(account);
+        accountService.save(account);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    /** READ */
-    @RequestMapping("/clients/current")
-    public ClientDTO getCurrent(Authentication authentication){
-        ClientDTO clientDTO = new ClientDTO(clientRepository.findByEmail(authentication.getName()));
-        return clientDTO;
-    }
-
+    /** READ CLIENTS */
     @RequestMapping("/clients")
-    public List<ClientDTO> getClients(){
-        return clientRepository.findAll()
-                .stream().map(client -> new ClientDTO(client))
-                .collect(Collectors.toList());
+    public List<ClientDTO> readClients(){
+        return clientService.findAllToListClientDTO();
     }
 
+    /** READ CLIENT: CURRENT */
+    @RequestMapping("/clients/current")
+    public ClientDTO readCurrent(Authentication authentication){
+        return clientService.findByEmailToClientDTO(authentication.getName());
+    }
+
+    /*
     @RequestMapping("/clients/{id}")
     public ClientDTO getClient(@PathVariable Long id){
         return clientRepository.findById(id)
                 .map(client -> new ClientDTO(client))
                 .orElse(null);
+
     }
+    */
 
 }

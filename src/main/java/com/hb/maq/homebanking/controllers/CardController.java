@@ -8,6 +8,8 @@ import com.hb.maq.homebanking.models.CardType;
 import com.hb.maq.homebanking.models.Client;
 import com.hb.maq.homebanking.repositories.CardRepository;
 import com.hb.maq.homebanking.repositories.ClientRepository;
+import com.hb.maq.homebanking.services.CardService;
+import com.hb.maq.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +29,9 @@ public class CardController {
 
     /** INYECCIÓN DE DEPENDENCIAS */
     @Autowired
-    ClientRepository clientRepository;
+    private ClientService clientService;
     @Autowired
-    CardRepository cardRepository;
+    private CardService cardService;
 
 
     /** ####### CRUD: CREATE | READ | UPDATE | DELETE ####### */
@@ -42,7 +44,7 @@ public class CardController {
             return new ResponseEntity<>("Tiene que seleccionar un tipo y color de tarjeta", HttpStatus.FORBIDDEN);
         }
 
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
 
         if ( client.getCards()
                 .stream().filter(card -> card.getType().equals(cardType))
@@ -54,7 +56,7 @@ public class CardController {
                             ((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)),
                             (int)(Math.random() * 999 + 1), LocalDate.now(), LocalDate.now().plusYears(5));
 
-            while ( cardRepository.findByNumber(card.getNumber()) != null ){
+            while ( cardService.findByNumber(card.getNumber()) != null ){
                 card.setNumber(
                         ((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)) + "-" +
                         ((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1))
@@ -62,7 +64,7 @@ public class CardController {
             }
 
             client.addCards(card);
-            cardRepository.save(card);
+            cardService.save(card);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
@@ -73,12 +75,8 @@ public class CardController {
     /** READ */
     @RequestMapping(value = "/clients/current/cards")
     public List<CardDTO> readCards (Authentication authentication){
-
-        Client client = clientRepository.findByEmail(authentication.getName());
-
-        return cardRepository.findByClient(client)
-                .stream().map(card -> new CardDTO(card))
-                .collect(Collectors.toList());
+        Client client = clientService.findByEmail(authentication.getName());
+        return cardService.findByClientToCardDTO(client);
     }
 
 
