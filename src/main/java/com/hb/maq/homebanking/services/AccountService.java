@@ -14,7 +14,11 @@ public interface AccountService {
     /** READ ACCOUNTS: FIND ALL */
 
     /** READ ACCOUNT: FIND BY */
+    Account findById(Long id);
     Account findByNumber(String number);
     AccountDTO findByIdToAccountDTO(Long id);
     List<AccountDTO> findByClientToListAccountDTO(Client client);
+
+    /** DELETE ACCOUNT */
+    void deleteById(Long id);
 }

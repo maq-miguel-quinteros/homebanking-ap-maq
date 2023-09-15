@@ -13,6 +13,7 @@ public class TransactionDTO {
     private double amount;
     private String description;
     private LocalDateTime date;
+    private double currentBalance;
 
     /** CONSTRUCTORES */
     public TransactionDTO() {}
@@ -22,6 +23,7 @@ public class TransactionDTO {
         this.amount = transaction.getAmount();
         this.description = transaction.getDescription();
         this.date = transaction.getDate();
+        this.currentBalance = transaction.getCurrentBalance();
     }
 
     /** GETTERS */
@@ -39,5 +41,8 @@ public class TransactionDTO {
     }
     public LocalDateTime getDate() {
         return date;
+    }
+    public double getCurrentBalance() {
+        return currentBalance;
     }
 }

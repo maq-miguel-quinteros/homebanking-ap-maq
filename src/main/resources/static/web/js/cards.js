@@ -6,6 +6,7 @@ Vue.createApp({
             debitCards: [],
             errorToats: null,
             errorMsg: null,
+
         }
     },
     methods: {
@@ -25,6 +26,15 @@ Vue.createApp({
         formatDate: function (date) {
             return new Date(date).toLocaleDateString('en-gb');
         },
+        compareDate: function (date) {
+            let date01 = new Date(date);
+            let date02 = new Date();
+            if (date01 < date02) {
+              return true;
+            } else {
+              return false;
+            }
+        },
         signOut: function () {
             axios.post('/api/logout')
                 .then(response => window.location.href = "/web/index.html")
@@ -33,6 +43,16 @@ Vue.createApp({
                     this.errorToats.show();
                 })
         },
+        deleteCard: function (id) {
+                    console.log(id);
+                    axios.delete('/api/clients/current/cards/?id='+id)
+                        .then(response => window.location.reload())
+                        .catch((error) => {
+                            this.errorMsg = error.response.data;
+                            this.errorToats.show();
+                        })
+                }
+
     },
     mounted: function () {
         this.errorToats = new bootstrap.Toast(document.getElementById('danger-toast'));

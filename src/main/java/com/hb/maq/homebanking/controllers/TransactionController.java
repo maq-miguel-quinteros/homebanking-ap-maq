@@ -15,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -38,7 +35,7 @@ public class TransactionController {
 
     /** CREATE */
     @Transactional
-    @RequestMapping(value = "/transactions", method = RequestMethod.POST)
+    @PostMapping(value = "/transactions")
     public ResponseEntity<Object> createTransactions(
             @RequestParam String fromAccountNumber, @RequestParam  String toAccountNumber,
             @RequestParam Double amount, @RequestParam String description, Authentication authentication){
@@ -78,14 +75,14 @@ public class TransactionController {
         }
 
         Transaction debit = new Transaction(TransactionType.DEBIT, amount * -1, description + " " + fromAccount.getNumber() ,
-                LocalDateTime.now());
+                LocalDateTime.now(), fromAccount.getBalance() - amount );
         fromAccount.addTransaction(debit);
         transactionService.save(debit);
         fromAccount.setBalance(fromAccount.getBalance() - amount);
         accountService.save(fromAccount);
 
         Transaction credit = new Transaction(TransactionType.CREDIT, amount, description + " " + toAccount.getNumber(),
-                LocalDateTime.now());
+                LocalDateTime.now(), toAccount.getBalance() + amount );
         toAccount.addTransaction(credit);
         transactionService.save(credit);
         toAccount.setBalance(toAccount.getBalance() + amount);

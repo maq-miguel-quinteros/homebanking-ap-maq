@@ -10,14 +10,12 @@ import com.hb.maq.homebanking.repositories.CardRepository;
 import com.hb.maq.homebanking.repositories.ClientRepository;
 import com.hb.maq.homebanking.services.CardService;
 import com.hb.maq.homebanking.services.ClientService;
+import com.hb.maq.homebanking.utils.CardUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +34,7 @@ public class CardController {
 
     /** ####### CRUD: CREATE | READ | UPDATE | DELETE ####### */
     /** CREATE */
-    @RequestMapping(value = "/clients/current/cards", method = RequestMethod.POST)
+    @PostMapping(value = "/clients/current/cards")
     public ResponseEntity<Object> createCard(@RequestParam CardType cardType, @RequestParam CardColor cardColor,
                                            Authentication authentication){
 
@@ -52,15 +50,11 @@ public class CardController {
 
             Card card = new Card(
                             (client.getFirstName() + " " + client.getLastName()), cardType, cardColor,
-                    ((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)) + "-" +
-                            ((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)),
-                            (int)(Math.random() * 999 + 1), LocalDate.now(), LocalDate.now().plusYears(5));
+                            CardUtils.getCardNumber(),  CardUtils.getCardCvv(),
+                            LocalDate.now(), LocalDate.now().plusYears(5));
 
             while ( cardService.findByNumber(card.getNumber()) != null ){
-                card.setNumber(
-                        ((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1)) + "-" +
-                        ((int)(Math.random() * 9999 + 1)) + "-" + ((int)(Math.random() * 9999 + 1))
-                );
+                card.setNumber( CardUtils.getCardNumber());
             }
 
             client.addCards(card);
@@ -72,12 +66,27 @@ public class CardController {
         }
     }
 
+
+
     /** READ */
-    @RequestMapping(value = "/clients/current/cards")
+    @GetMapping(value = "/clients/current/cards")
     public List<CardDTO> readCards (Authentication authentication){
         Client client = clientService.findByEmail(authentication.getName());
         return cardService.findByClientToCardDTO(client);
     }
+
+    /** Eliminar tarjetas	Agregar botón para eliminar una tarjeta, se debe crear el servicio y llamarlo desde javascript */
+    @RequestMapping(value = "/clients/current/cards/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> deleteCard(@PathVariable Long id){
+        if (cardService.findById(id) != null){
+            cardService.deleteCard(id);
+            return new ResponseEntity<>(HttpStatus.PROCESSING);
+        }else {
+            return new ResponseEntity<>("La tarjeta a borrar no existe", HttpStatus.FORBIDDEN);
+        }
+
+    }
+
 
 
 }

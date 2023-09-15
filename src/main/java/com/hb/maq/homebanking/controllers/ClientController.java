@@ -32,7 +32,7 @@ public class ClientController {
     private AccountService accountService;
 
     /** CREATE CLIENTE */
-    @RequestMapping(value = "/clients", method = RequestMethod.POST)
+    @PostMapping(value = "/clients")
     public ResponseEntity<Object> createClient(@RequestParam String firstName, @RequestParam String lastName,
                                             @RequestParam String email, @RequestParam String password) {
 
@@ -54,13 +54,13 @@ public class ClientController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     /** READ CLIENTS */
-    @RequestMapping("/clients")
+    @GetMapping("/clients")
     public List<ClientDTO> readClients(){
         return clientService.findAllToListClientDTO();
     }
 
     /** READ CLIENT: CURRENT */
-    @RequestMapping("/clients/current")
+    @GetMapping("/clients/current")
     public ClientDTO readCurrent(Authentication authentication){
         return clientService.findByEmailToClientDTO(authentication.getName());
     }

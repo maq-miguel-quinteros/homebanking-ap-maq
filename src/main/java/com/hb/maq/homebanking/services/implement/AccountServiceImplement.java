@@ -23,7 +23,13 @@ public class AccountServiceImplement implements AccountService {
         accountRepository.save(account);
     }
 
+    @Override
+    public Account findById(Long id) {
+        return accountRepository.findById(id).orElse(null);
+    }
+
     /** READ ACCOUNT: FIND BY */
+
     @Override
     public Account findByNumber(String number) {
         return accountRepository.findByNumber(number);
@@ -39,5 +45,11 @@ public class AccountServiceImplement implements AccountService {
         return accountRepository.findByClient(client).stream()
                 .map(account -> new AccountDTO(account))
                 .collect(Collectors.toList());
+    }
+
+    /** DELETE ACCOUNT */
+    @Override
+    public void deleteById(Long id) {
+        accountRepository.deleteById(id);
     }
 }

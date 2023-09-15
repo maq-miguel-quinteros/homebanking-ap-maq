@@ -3,10 +3,12 @@ package com.hb.maq.homebanking.controllers;
 import com.hb.maq.homebanking.dtos.AccountDTO;
 import com.hb.maq.homebanking.models.Account;
 import com.hb.maq.homebanking.models.Client;
+import com.hb.maq.homebanking.models.Transaction;
 import com.hb.maq.homebanking.repositories.AccountRepository;
 import com.hb.maq.homebanking.repositories.ClientRepository;
 import com.hb.maq.homebanking.services.AccountService;
 import com.hb.maq.homebanking.services.ClientService;
+import com.hb.maq.homebanking.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +28,11 @@ public class AccountController {
     private AccountService accountService;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private TransactionService transactionService;
 
     /** CREATE ACCOUNT */
-    @RequestMapping(value = "/clients/current/accounts", method = RequestMethod.POST)
+    @PostMapping(value = "/clients/current/accounts")
     public ResponseEntity<Object> createAccount(Authentication authentication){
 
         Client client = clientService.findByEmail(authentication.getName());
@@ -53,14 +57,35 @@ public class AccountController {
     }
 
     /** READ ACCOUNTS CURRENT CLIENT */
-    @RequestMapping(value = "/clients/current/accounts")
+    @GetMapping(value = "/clients/current/accounts")
     public List<AccountDTO> readAccounts(Authentication authentication){
         Client client = clientService.findByEmail(authentication.getName());
         return accountService.findByClientToListAccountDTO(client);
     }
-    @RequestMapping("/accounts/{id}")
+    @GetMapping("/accounts/{id}")
     public AccountDTO readAccount(@PathVariable Long id){
         return accountService.findByIdToAccountDTO(id);
+    }
+
+
+
+
+    /** Agregar botón para eliminar cuentas, se deben eliminar las transacciones de la cuenta. */
+    @DeleteMapping("/accounts/{id}")
+    public ResponseEntity<Object> deleteAccount(@PathVariable Long id){
+        Account account = accountService.findById(id);
+        if ( account != null){
+            List<Transaction> transactions = transactionService.findAllByAccount(account);
+            if (transactions != null){
+                for (Transaction transaction : transactions ) {
+                    transactionService.deleteById(transaction.getId());
+                }
+            }
+            accountService.deleteById(account.getId());
+            return new ResponseEntity<>(HttpStatus.PROCESSING);
+        } else {
+            return new ResponseEntity<>("La cuenta que desea borrar no existe", HttpStatus.FORBIDDEN);
+        }
     }
 
     /*

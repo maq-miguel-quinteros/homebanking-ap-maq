@@ -11,12 +11,16 @@ import java.util.List;
 
 public interface CardService {
 
-    /** CREATE ACCOUNT & UPDATE ACCOUNT: SAVE */
+    /** CREATE CARDS & UPDATE CARDS: SAVE */
     void save(Card card);
 
-    /** READ ACCOUNTS: FIND ALL */
+    /** READ CARDS: FIND ALL */
 
-    /** READ ACCOUNT: FIND BY */
+    /** READ CARD: FIND BY */
     Card findByNumber(String number);
     List<CardDTO> findByClientToCardDTO(Client client);
+    Card findById(Long id);
+
+    /** DELETE CARDS */
+    void deleteCard(Long id);
 }

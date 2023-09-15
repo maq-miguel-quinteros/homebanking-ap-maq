@@ -19,17 +19,19 @@ public class Transaction {
     private double amount;
     private String description;
     private LocalDateTime date;
+    private double currentBalance;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id")
     private Account account;
 
     /** CONSTRUCTORES */
     public Transaction() {}
-    public Transaction(TransactionType type, double amount, String description, LocalDateTime date) {
+    public Transaction(TransactionType type, double amount, String description, LocalDateTime date, double currentBalance) {
         this.type = type;
         this.amount = amount;
         this.description = description;
         this.date = date;
+        this.currentBalance = currentBalance;
     }
 
     /** GETTERS Y SETTERS */
@@ -65,5 +67,11 @@ public class Transaction {
     }
     public void setAccount(Account account) {
         this.account = account;
+    }
+    public double getCurrentBalance() {
+        return currentBalance;
+    }
+    public void setCurrentBalance(double currentBalance) {
+        this.currentBalance = currentBalance;
     }
 }

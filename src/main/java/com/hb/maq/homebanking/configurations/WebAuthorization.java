@@ -26,11 +26,17 @@ public class WebAuthorization  {
                                     "/api/logout").permitAll()
                 .antMatchers(HttpMethod.POST,
                         "/api/clients").permitAll()
+
                 .antMatchers(
                         "/api/clients/current",
                                     "/api/clients/current/accounts",
                                     "/api/clients/current/cards",
                                     "/api/loans").hasAuthority("CLIENT")
+
+                .antMatchers(HttpMethod.DELETE,
+                        "/api/accounts/**",
+                                    "/api/clients/current/cards/**").hasAuthority("CLIENT")
+
                 .antMatchers(HttpMethod.POST,
                         "/api/clients/current/accounts",
                                     "/api/clients/current/cards",
